@@ -27,7 +27,7 @@
             <a href="#" class="close" data-dismiss="alert">
                 &times;
             </a>
-            <strong th:text="${message}" ></strong>
+            <strong th:text="${message}"></strong>
         </div>
         <form method="post" th:action="@{/upload}" enctype="multipart/form-data">
             <div class="form-group">
@@ -41,36 +41,60 @@
 <div th:if="${titles ne null}" class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title" style="padding-bottom: 10px">uploaded Avro</h3>
-        <button id="save" type="submit" class="btn btn-primary" data-toggle="button" th:name="${filename}">save and download</button>
+        <button id="add_record" type="button" class="btn btn-success">add</button>
+        <button id="save" type="submit" class="btn btn-primary" data-toggle="button" th:name="${filename}">save and
+            download
+        </button>
     </div>
     <div class="panel-body" style="overflow: scroll;">
         <form id="form" role="form" method="post">
             <table class="table table-striped table-hover">
                 <thead>
-                    <tr>
-                        <th th:each="title, iStat : ${titles}" th:text="${title}"></th>
-                    </tr>
+                <tr>
+                    <th></th>
+                    <th th:each="title, iStat : ${titles}" th:text="${title}"></th>
+                </tr>
                 </thead>
-                <tbody>
-                    <tr th:name="data" th:each="data, iStat : ${datas}">
-                        <td th:each="detail, idx : ${data}">
-                            <input type="text" class="form-control"
-                                   th:value="${detail.value}"
-                                   th:name="${detail.name}"
-                                   th:valuetype="${detail.type}"
-                                   th:style="'min-width: ' + *{#strings.length(detail.value) * 10} + 'px;'">
-                        </td>
-                    </tr>
+                <tbody id="data_body">
+                <tr name="data" th:each="data : ${datas}">
+                    <td>
+                        <button name="remove_record" type="button" class="btn btn-danger">-</button>
+                    </td>
+                    <td th:each="detail : ${data}">
+                        <input type="text" class="form-control"
+                               th:value="${detail.value}"
+                               th:name="${detail.name}"
+                               th:valuetype="${detail.type}"
+                               th:style="'min-width: ' + *{#strings.length(detail.value) * 10} + 'px;'">
+                    </td>
+                </tr>
                 </tbody>
             </table>
         </form>
     </div>
 </div>
+<div style="display: none">
+    <table>
+        <tbody id="record_template">
+        <tr name="data" th:each="data : ${datas}" th:if="${dataStat.index eq 0}">
+            <td th:name="${dataStat.index}">
+                <button name="remove_record" type="button" class="btn btn-danger">-</button>
+            </td>
+            <td th:each="detail, idx : ${data} ">
+                <input type="text" class="form-control"
+                       th:name="${detail.name}"
+                       th:valuetype="${detail.type}"
+                       th:style="'min-width: ' + *{#strings.length(detail.value) * 10} + 'px;'">
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
 
 
 <div class="panel panel-default" style="background-color: #fcf8e3;">
     <div class="panel-body">
-        If have some problems,  try using Chrome. And allow download operations
+        If have some problems, try using Chrome. And allow download operations
     </div>
 </div>
 
@@ -78,7 +102,7 @@
     $(document).ready(function () {
         function get_form_data() {
             var form_data = []
-            $("[name='data']").each(function (index) {
+            $("#form").find("[name='data']").each(function (index) {
                 var record = []
                 $(this).find("input").each(function (idx) {
                     var name = $(this).attr('name')
@@ -94,6 +118,15 @@
             return form_data
         }
 
+        $(document).on("click", "#add_record", function () {
+            innerHtml = $("#record_template").html()
+            $("#data_body").append(innerHtml)
+        })
+
+        $(document).on("click", "[name='remove_record']", function () {
+            $(this).parent().parent().remove()
+        })
+
         $(document).on("click", "#save", function () {
             var form_data = get_form_data()
             var filename = $("#save").attr("name")
@@ -101,7 +134,7 @@
             xhr.open("POST", "/save");
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.responseType = "arraybuffer";
-            xhr.onload = function(oEvent) {
+            xhr.onload = function (oEvent) {
                 if (this.status === 200) {
                     var blob = new Blob([xhr.response], {type: "application/octet-stream"});
                     var link = document.createElement('a');
@@ -114,10 +147,13 @@
                     link.click();
                     body.removeChild(link);
                     window.URL.revokeObjectURL(link.href);
+                } else {
+                    alert("invalid data ! please check modified data")
+                    console.log(oEvent)
                 }
             };
 
-            xhr.send(JSON.stringify({"data":form_data, "filename":filename}));
+            xhr.send(JSON.stringify({"data": form_data, "filename": filename}));
         })
     });
 </script>
