@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Getting Started: Serving Web Content</title>
+    <title>avro editor</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
             integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
@@ -10,75 +10,92 @@
             integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
             crossorigin="anonymous"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
           integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
 </head>
-<body style="padding: 30px;">
-<div class="page-header">
-    <h1>Avro Editor &nbsp;&nbsp;<small>Simple online editor</small></h1>
-</div>
-
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">Select Avro File</h3>
-    </div>
-    <div class="panel-body">
-        <div th:if="${message ne null}" class="alert alert-warning">
-            <a href="#" class="close" data-dismiss="alert">
-                &times;
-            </a>
-            <strong th:text="${message}"></strong>
-        </div>
-        <form method="post" th:action="@{/upload}" enctype="multipart/form-data">
-            <div class="form-group">
-                <input type="file" name="file" class="form-control-file" accept=".avro">
+<body>
+<div class="container" style="width: 100%;">
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <div class="navbar-brand">Avro Editor</div>
             </div>
-            <button type="submit" class="btn btn-primary">Upload File</button>
-        </form>
+            <div>
+                <p class="navbar-text">simple online editor</p>
+            </div>
+        </div>
+    </nav>
+    <div class="row">
+        <div class="col-md-2">
+
+            <form method="post" th:action="@{/upload}" enctype="multipart/form-data">
+                <div class="form-group">
+                    <input id="avro_select_input" type="file" name="file" class="form-control-file" accept=".avro" style="width: 100%;">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Parse Avro file</button>
+            </form>
+
+        </div>
+
+        <div class="col-md-10" style="padding-left: 0;">
+
+            <div th:if="${titles ne null}" class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title" style="padding-bottom: 10px" th:text="${originfilename}"></h3>
+                    <button id="add_record" type="button" class="btn btn-success">add empty line</button>
+                    <button id="save" type="submit" class="btn btn-primary" data-toggle="button" th:name="${filename}">save and download</button>
+                </div>
+                <div class="panel-body" style="overflow-x: auto;">
+                    <form id="form" role="form" method="post">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                            <tr>
+                                <th></th>
+                                <th th:each="title, iStat : ${titles}" th:text="${title}"></th>
+                            </tr>
+                            </thead>
+                            <tbody id="data_body">
+                            <tr name="data" th:each="data : ${datas}">
+                                <td>
+                                    <div style="width: 80px;">
+                                        <button name="remove_record" type="button" class="btn btn-danger"
+                                                data-toggle="tooltip" data-placement="top" title="remove this line">-</button>
+                                        <button name="copy_record" type="button" class="btn btn-success"
+                                                data-toggle="tooltip" data-placement="top" title="copy this line">+</button>
+                                    </div>
+                                </td>
+                                <td th:each="detail : ${data}">
+                                    <input type="text" class="form-control"
+                                           th:value="${detail.value}"
+                                           th:name="${detail.name}"
+                                           th:valuetype="${detail.type}"
+                                           th:style="'min-width: ' + *{#strings.length(#strings.concatReplaceNulls('defualt length', detail.value)) * 10} + 'px;'">
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+            </div>
+
+        </div>
     </div>
 </div>
 
-<div th:if="${titles ne null}" class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title" style="padding-bottom: 10px">uploaded Avro</h3>
-        <button id="add_record" type="button" class="btn btn-success">add</button>
-        <button id="save" type="submit" class="btn btn-primary" data-toggle="button" th:name="${filename}">save and
-            download
-        </button>
-    </div>
-    <div class="panel-body" style="overflow: scroll;">
-        <form id="form" role="form" method="post">
-            <table class="table table-striped table-hover">
-                <thead>
-                <tr>
-                    <th></th>
-                    <th th:each="title, iStat : ${titles}" th:text="${title}"></th>
-                </tr>
-                </thead>
-                <tbody id="data_body">
-                <tr name="data" th:each="data : ${datas}">
-                    <td>
-                        <button name="remove_record" type="button" class="btn btn-danger">-</button>
-                    </td>
-                    <td th:each="detail : ${data}">
-                        <input type="text" class="form-control"
-                               th:value="${detail.value}"
-                               th:name="${detail.name}"
-                               th:valuetype="${detail.type}"
-                               th:style="'min-width: ' + *{#strings.length(#strings.concatReplaceNulls('defualt length', detail.value)) * 10} + 'px;'">
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </form>
-    </div>
-</div>
+
 <div style="display: none">
     <table>
         <tbody id="record_template">
         <tr name="data" th:each="data : ${datas}" th:if="${dataStat.index eq 0}">
             <td th:name="${dataStat.index}">
-                <button name="remove_record" type="button" class="btn btn-danger">-</button>
+                <div style="width: 80px;">
+                    <button name="remove_record" type="button" class="btn btn-danger"
+                            data-toggle="tooltip" data-placement="top" title="remove this line">-</button>
+                    <button name="copy_record" type="button" class="btn btn-success"
+                            data-toggle="tooltip" data-placement="top" title="copy this line">+</button>
+                </div>
             </td>
             <td th:each="detail, idx : ${data} ">
                 <input type="text" class="form-control"
@@ -100,6 +117,14 @@
 
 <script>
     $(document).ready(function () {
+        $(function () { $("[data-toggle='tooltip']").tooltip(); });
+        $('#avro_select_input').change(function() {
+            var i = $(this).parent().prev('label').clone();
+            var file = $('#avro_select_input')[0].files[0].name;
+            $(this).parent().prev('label').text(file);
+        });
+
+
         function get_form_data() {
             var form_data = []
             $("#form").find("[name='data']").each(function (index) {
@@ -124,7 +149,17 @@
         })
 
         $(document).on("click", "[name='remove_record']", function () {
-            $(this).parent().parent().remove()
+            $(this).parent().parent().parent().remove()
+        })
+
+        $(document).on("click", "[name='copy_record']", function () {
+            var innerHtml = $(this).parent().parent().parent().html()
+            $("#data_body").append('<tr name="data" >' + innerHtml +'</tr>>')
+        })
+
+        $(document).on("change", "#data_body input", function () {
+            var text_value = $(this).val()
+            $(this).attr("value", text_value)
         })
 
         $(document).on("click", "#save", function () {

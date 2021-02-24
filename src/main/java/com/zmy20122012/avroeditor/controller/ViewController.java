@@ -40,6 +40,7 @@ public class ViewController {
         UploadFilesResult uploadFilesResult = fileService.uploadFiles(file);
 
         // return success response
+        attributes.addFlashAttribute("originfilename", uploadFilesResult.getOriginFileName());
         attributes.addFlashAttribute("message", uploadFilesResult.getMessage());
         attributes.addFlashAttribute("filename", uploadFilesResult.getFileNameInServer());
 

@@ -33,7 +33,7 @@ public class FileService {
             e.printStackTrace();
             return new UploadFilesResult("upload files error");
         }
-        return new UploadFilesResult("successfully uploaded", fileNameInServer);
+        return new UploadFilesResult(fileName,"successfully uploaded", fileNameInServer);
     }
 
     private String generateFileNameInServer(String fileName){

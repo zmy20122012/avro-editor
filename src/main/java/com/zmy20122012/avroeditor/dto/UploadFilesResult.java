@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UploadFilesResult {
+    private String originFileName;
     private String message;
     private String fileNameInServer;
 
