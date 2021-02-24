@@ -65,7 +65,7 @@
                                th:value="${detail.value}"
                                th:name="${detail.name}"
                                th:valuetype="${detail.type}"
-                               th:style="'min-width: ' + *{#strings.length(detail.value) * 10} + 'px;'">
+                               th:style="'min-width: ' + *{#strings.length(#strings.concatReplaceNulls('defualt length', detail.value)) * 10} + 'px;'">
                     </td>
                 </tr>
                 </tbody>
@@ -84,7 +84,7 @@
                 <input type="text" class="form-control"
                        th:name="${detail.name}"
                        th:valuetype="${detail.type}"
-                       th:style="'min-width: ' + *{#strings.length(detail.value) * 10} + 'px;'">
+                       th:style="'min-width: ' + *{#strings.length(#strings.concatReplaceNulls('defualt length', detail.value)) * 10} + 'px;'">
             </td>
         </tr>
         </tbody>
