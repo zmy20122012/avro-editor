@@ -15,11 +15,22 @@
           integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
     <style>
+        .mytr:hover{
+            background-color: #a8dcff;
+        }
         .table_data_input{
             border: none;
             box-shadow: none;
-            /* background-color: transparent; */
             background-color: rgba(255,255,255,0.5);
+            font-size: 12px;
+            height: 28px;
+            padding: 0;
+        }
+        .mytd{
+            padding: 1px !important;
+        }
+        .operation_btn{
+            padding: 0px 6px;
         }
     </style>
 </head>
@@ -36,18 +47,19 @@
         </div>
     </nav>
     <div class="row">
-        <div class="col-md-2">
-
-            <form method="post" th:action="@{/upload}" enctype="multipart/form-data">
-                <div class="form-group">
-                    <input id="avro_select_input" type="file" name="file" class="form-control-file" accept=".avro" style="width: 100%;">
-                </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Parse Avro file</button>
-            </form>
-
+        <div class="col-md-12" style="padding-bottom: 20px">
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+                <form method="post" th:action="@{/upload}" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <input id="avro_select_input" type="file" name="file" class="form-control-file" accept=".avro" style="width: 100%;">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Parse Avro file</button>
+                </form>
+            </div>
         </div>
 
-        <div class="col-md-10" style="padding-left: 0;">
+        <div class="col-md-12" style="padding: 0;">
 
             <div th:if="${titles ne null}" class="panel panel-default">
                 <div class="panel-heading">
@@ -65,21 +77,19 @@
                             </tr>
                             </thead>
                             <tbody id="data_body">
-                            <tr name="data" th:each="data : ${datas}">
-                                <td>
+                            <tr class="mytr" name="data" th:each="data : ${datas}">
+                                <td class="mytd">
                                     <div style="width: 80px;">
-                                        <button name="remove_record" type="button" class="btn btn-danger"
-                                                data-toggle="tooltip" data-placement="top" title="remove this line">-</button>
-                                        <button name="copy_record" type="button" class="btn btn-success"
-                                                data-toggle="tooltip" data-placement="top" title="copy this line">+</button>
+                                        <button name="remove_record" type="button" class="btn btn-danger operation_btn" data-placement="top">-</button>
+                                        <button name="copy_record" type="button" class="btn btn-success operation_btn" data-placement="top">copy</button>
                                     </div>
                                 </td>
-                                <td th:each="detail : ${data}">
+                                <td th:each="detail : ${data}" class="mytd">
                                     <input type="text" class="form-control table_data_input"
                                            th:value="${detail.value}"
                                            th:name="${detail.name}"
                                            th:valuetype="${detail.type}"
-                                           th:style="'min-width: ' + *{#strings.length(#strings.concatReplaceNulls('defualt length', detail.value)) * 10} + 'px;'">
+                                           th:style="'min-width: ' + *{#strings.length(#strings.concatReplaceNulls('defualt length', detail.value)) * 9} + 'px;'">
                                 </td>
                             </tr>
                             </tbody>
@@ -96,20 +106,18 @@
 <div style="display: none">
     <table>
         <tbody id="record_template">
-        <tr name="data" th:each="data : ${datas}" th:if="${dataStat.index eq 0}">
-            <td th:name="${dataStat.index}">
+        <tr class="mytr" name="data" th:each="data : ${datas}" th:if="${dataStat.index eq 0}">
+            <td th:name="${dataStat.index}" class="mytd">
                 <div style="width: 80px;">
-                    <button name="remove_record" type="button" class="btn btn-danger"
-                            data-toggle="tooltip" data-placement="top" title="remove this line">-</button>
-                    <button name="copy_record" type="button" class="btn btn-success"
-                            data-toggle="tooltip" data-placement="top" title="copy this line">+</button>
+                    <button name="remove_record" type="button" class="btn btn-danger operation_btn" data-placement="top">-</button>
+                    <button name="copy_record" type="button" class="btn btn-success operation_btn" data-placement="top">copy</button>
                 </div>
             </td>
-            <td th:each="detail, idx : ${data} ">
+            <td th:each="detail, idx : ${data} " class="mytd">
                 <input type="text" class="form-control"
                        th:name="${detail.name}"
                        th:valuetype="${detail.type}"
-                       th:style="'min-width: ' + *{#strings.length(#strings.concatReplaceNulls('defualt length', detail.value)) * 10} + 'px;'">
+                       th:style="'min-width: ' + *{#strings.length(#strings.concatReplaceNulls('defualt length', detail.value)) * 9} + 'px;'">
             </td>
         </tr>
         </tbody>
@@ -125,7 +133,6 @@
 
 <script>
     $(document).ready(function () {
-        $(function () { $("[data-toggle='tooltip']").tooltip(); });
         $('#avro_select_input').change(function() {
             var i = $(this).parent().prev('label').clone();
             var file = $('#avro_select_input')[0].files[0].name;
